@@ -1,5 +1,6 @@
 rm(list = ls())
 library(tidyverse)
+library(readxl)
 library(patchwork)
 source("./code/01_load_ps.R")
 
@@ -39,7 +40,7 @@ p <- ggplot(modulus, aes(x = freq_rad, y = avg, color = region)) +
   facet_wrap(~measure, scales = "free_y", nrow = 1) +
   scale_color_manual(
     name = "Region",
-    values = c("inner" = "darkseagreen", "outer" = "lightsalmon3")
+    values = c("inner" = "steelblue", "outer" = "lightsalmon2")
   ) +
   labs(
     x = "Frequency (rad/s)",
