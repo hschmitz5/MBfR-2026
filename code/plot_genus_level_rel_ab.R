@@ -3,7 +3,7 @@ library(ComplexHeatmap)
 source("./code/01_load_ps.R")
 
 # number of rows to show
-n_show <- 25
+n_show <- 20
 
 write2excel <- 0
 
