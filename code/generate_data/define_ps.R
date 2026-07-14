@@ -4,7 +4,7 @@ rm(list = ls())
 library(qiime2R)
 library(phyloseq)
 library(tidyverse)
-source("./code/ps_agglom_function.R")
+source("./code/generate_data/ps_agglom_function.R")
 
 # Import QIIME2 data as phyloseq object
 ps_full <- qiime2R::qza_to_phyloseq(
@@ -19,12 +19,13 @@ keep <- sample_names(ps_full) %in% c("c_AC", "c_ACb")
 ps <- prune_samples(keep, ps_full)
 
 # Rename samples
-new_names <- c(
+region_names <- c(
   "c_AC" = "outer",
   "c_ACb" = "inner"
 )
 
-sample_names(ps) <- new_names[sample_names(ps)]
+# rename sample names
+sample_names(ps) <- region_names[sample_names(ps)]
   
 # ------ Filter ------
 
