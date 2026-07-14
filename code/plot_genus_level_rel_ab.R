@@ -1,9 +1,9 @@
 rm(list = ls())
 library(ComplexHeatmap)
-source("./code/R/01_load_ps.R")
+source("./code/01_load_ps.R")
 
 # number of rows to show
-n_show <- 30
+n_show <- 25
 
 write2excel <- 0
 
@@ -42,30 +42,11 @@ m_df <- rel_df %>%
   rownames_to_column(var = "Genus") %>%
   get_metabolism() 
 
-# DA Taxa
-DA_genera <- readRDS("./data/DA/DA_genus_processed.rds") %>%
-  pull(Genus) %>%
-  unique()
 
 #### ---- Plotting ------
 
-# size annotation
-size_annot <- HeatmapAnnotation(
-  sz = anno_block(
-    gp = gpar(
-      fill = c(rep("lightgray", n_sizes)), # all the same color
-      col = NA # removes border
-    ),
-    labels = size$name,
-    labels_gp = gpar(
-      col = c(rep("black", n_sizes)), 
-      fontsize = col_fontsize
-    )
-  )
-)
-
 # metabolism annotation
-m_colors  <- c("P" = "#66C24A", "V" = "#EAEC3F") 
+m_colors  <- c("P" = "#66C24A", "V" = "#EAEC3F")
 m_annot <- rowAnnotation(
   df = m_df,
   # column names
@@ -94,47 +75,45 @@ lgd <- Legend(
 # Dimensions
 n_cols <- ncol(log_mat)
 n_rows <- nrow(log_mat)
-split = rep(1:n_sizes, each = n_replicates)
 
 # Labels
-row_labels <- rownames(log_mat)
+# Truncate names if they're longer than 25 characters (append with ...)
+row_labels <- ifelse(
+  nchar(rownames(log_mat)) > 25,
+  paste0(substr(rownames(log_mat), 1, 25), "..."),  
+  rownames(log_mat)
+)
+rownames(log_mat) = row_labels
 # italicize classified genera
 italic_rows <- !grepl("^(Unk|midas)", row_labels) 
-# bold DA taxa
-bold_rows <- row_labels %in% DA_genera
 # Apply
-row_fontface <- ifelse(
-  bold_rows & italic_rows, "bold.italic",
-  ifelse(bold_rows, "bold",
-         ifelse(italic_rows, "italic", "plain"))
-)
+row_fontface <- ifelse(italic_rows, "italic", "plain")
 
 # Legend Colors
 ht_colors <- met.brewer(taxa_pal, type = "continuous")
 # Display legend ticks
-breaks_rel_display <- c(0, 0.1, 1, 10, 25) # %
+breaks_rel_display <- c(0, 0.1, 1, 10, 73) # %
 breaks_log_display <- log10(breaks_rel_display + pseudo) # Log (%)
 
 ht <- Heatmap(
   log_mat,
   # columns
+  show_column_names = TRUE,  
+  column_names_rot = -60,
   column_title = NULL, #"Relative Abundance",
   cluster_columns = FALSE, # changes sample order
-  show_column_names = FALSE,
-  column_split = split, # put a gap between sizes
   # heatmap legend
-  col = ht_colors, #ht_col_fun,
+  col = ht_colors, 
   show_heatmap_legend = TRUE, 
   heatmap_legend_param = list(
     at = breaks_log_display,
     labels = breaks_rel_display,
     title = NULL, #"Log (%)",
-    direction = "horizontal",
-    legend_width = unit(7, "cm")
+    legend_height = unit(6.5, "cm")
+    # direction = "horizontal"
   ),
   # Annotations
-  bottom_annotation = size_annot,
-  right_annotation = m_annot, 
+  right_annotation = m_annot,
   # Display size
   width  = unit(n_cols * cell_w, "inches"),
   height = unit(n_rows * cell_h, "inches"),
@@ -147,11 +126,11 @@ fname_rel <- "./figures/genus_level_rel_ab.png"
 
 # Draw combined heatmap
 png(fname_rel,
-    width = 7,  # width in inches; can adjust
+    width = 4.5,  # width in inches; can adjust
     height = 8, # height in inches; can adjust
     units = "in", res = 300)
-draw(ht, heatmap_legend_side = "top") #, annotation_legend_side = "top") 
-draw(lgd, x = unit(0.7, "npc"), y = unit(0.98, "npc"), just = c("right", "top"))
+draw(ht, heatmap_legend_side = "left") 
+draw(lgd, x = unit(0.2, "npc"), y = unit(0.98, "npc"), just = c("right", "top")) # metabolism legend
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
