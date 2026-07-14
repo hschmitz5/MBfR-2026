@@ -77,7 +77,7 @@ p <- ggplot(data = df, aes(x = region, y = avg, fill = assay)) +
     position = position_dodge(width = 0.8),
     width = 0.2
   ) +
-  facet_wrap(~extract, scales = "free_y") + 
+  facet_wrap(~extract, scales = "fixed") + 
   # ylim(0, max_y) +
   labs(
     y = expression(paste(mu, "g/mgTSS")),
