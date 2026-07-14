@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Ignore everything in the results and data directories
+/data/
+/figures/
+/results/
+*.nb.html
+.positai
