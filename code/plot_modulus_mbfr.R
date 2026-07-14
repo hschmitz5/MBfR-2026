@@ -1,5 +1,4 @@
 rm(list = ls())
-library(readxl)
 library(tidyverse)
 library(patchwork)
 source("./code/01_load_ps.R")
