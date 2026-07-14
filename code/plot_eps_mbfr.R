@@ -2,19 +2,14 @@ rm(list = ls())
 library(tidyverse)
 library(patchwork)
 
-root_name   <- "fresh"
-
-# -----------------------
-
-# Format Data
-
-fname_pn    <- paste0("./data/",root_name,"_PN_conc.rds")
-fname_polys <- paste0("./data/",root_name,"_PS_conc.rds")
+# File names for concentration data
+fname_pn    <- paste0("./data/EPS/PN_conc.rds")
+fname_polys <- paste0("./data/EPS/PS_conc.rds")
 
 # Calculate average and std of replicates
 group_data <- function(fname) {
   df <- readRDS(fname) %>%
-    group_by(biofilm, extract) %>%
+    group_by(region, extract) %>%
     summarize(
       avg = mean(C_TSS),
       sd = sd(C_TSS),
@@ -25,98 +20,110 @@ group_data <- function(fname) {
 PN <- group_data(fname_pn) 
 PS <- group_data(fname_polys)
 
+# Calculate PN + PS and PN/PS
+df_wide <- left_join(
+  PN %>% select(region, extract, PN_avg = avg, PN_sd = sd), 
+  PS %>% select(region, extract, PS_avg = avg, PS_sd = sd), 
+  by = c("region", "extract")
+  ) %>%
+  mutate(
+    total = PN_avg + PS_avg,
+    PNPS = PN_avg/PS_avg,
+    sd = NA
+    ) 
+
 # Combine into single data frame
 df <- bind_rows(
-    PN = PN,
-    PS = PS,
-    .id = "assay"
+  'Protein (PN)' = PN,
+  'Polysaccharide (PS)' = PS,
+  'Total EPS (PN + PS)' = df_wide %>% select(region, extract, avg = total, sd),
+  .id = "assay"
   ) %>%
+  mutate(
+    extract = recode(extract,"LB" = "Loosely Bound","TB" = "Tightly Bound"),
+    extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound")),
+    assay = factor(assay, levels = c("Polysaccharide (PS)", "Protein (PN)", "Total EPS (PN + PS)"))
+    ) 
+
+# Calculate PN/PS
+PNPS <- df_wide %>% 
+  select(region, extract, avg = PNPS) %>%
   mutate(
     extract = recode(extract,"LB" = "Loosely Bound","TB" = "Tightly Bound")
-  )
+    ) 
 
-# Calculate PN/PS and total EPS
-df_wide <- df %>%
-  pivot_wider(
-    names_from = assay,
-    values_from = c(avg, sd),
-    names_glue = "{assay}_{.value}"
-  ) %>%
-  mutate(
-    PNPS = PN_avg/PS_avg,
-    total_avg = PN_avg + PS_avg
-  )
 
-# Define total EPS
-tot <- df_wide %>%
-  transmute(assay = "total", biofilm, extract, avg = total_avg)
+# ------ Plot ------
 
 # Determine maximum avg + sd
-max_y <- ceiling(
-  max(df$avg + df$sd)
-)
+max_y1 <- df %>%
+  filter(assay != "Total EPS (PN + PS)") %>%
+  summarise(max_y = max(avg + sd)) %>%
+  pull(max_y)
 
-# Get rid of acronyms
-df <- df %>%
-  mutate(
-    assay = recode(assay, "PN" = "protein (PN)", "PS" = "polysaccharide (PS)")
+max_y2 <- df %>%
+  filter(assay == "Total EPS (PN + PS)") %>%
+  summarise(max_y = max(avg)) %>%
+  pull(max_y)
+
+max_y <- ceiling(
+  max(max_y1, max_y2)
   )
 
-# -------------------------------
-
-# Make Plot
-p <- ggplot(data = df, aes(x = biofilm, y = avg, fill = assay)) +
-  geom_col(position = "dodge", width = 0.6) +
+p <- ggplot(data = df, aes(x = region, y = avg, fill = assay)) +
+  geom_col(position = "dodge", width = 0.8) +
   geom_errorbar(
     aes(ymin = avg - sd, ymax = avg + sd),
-    position = position_dodge(width = 0.6),
+    position = position_dodge(width = 0.8),
     width = 0.2
   ) +
-  geom_point(data = tot, aes(x = biofilm, y = avg, color = assay), shape = 20) +
-  facet_wrap(~extract, nrow=1, strip.position = "top") +
-  ylim(0, max_y) +
+  facet_wrap(~extract, scales = "free_y") + 
+  # ylim(0, max_y) +
   labs(
-    x = "Region",
     y = expression(paste(mu, "g/mgTSS")),
-    color = NULL,
-    fill = NULL
+    x = NULL,
+    fill = NULL # legend titles
   ) +
   scale_fill_manual(
     values = c(
-      "protein (PN)" = "gray",
-      "polysaccharide (PS)" = "lightblue"
+      "Polysaccharide (PS)" = "lightsalmon2",
+      "Protein (PN)"        = "lightblue",
+      "Total EPS (PN + PS)"      = "steelblue" 
     )
   ) +
-  scale_color_manual(
-    values = c("total" = "black")
-  ) +
-  theme_minimal(base_size = 12) +
+  theme_classic(base_size = 12) +
   theme(
     strip.background = element_rect(
-      fill = "white",
-      colour = "lightgray"
-    )
-  ) +
-  guides(
-    fill = guide_legend(order = 1),
-    color = guide_legend(order = 2)
+      colour = NA # facet label outline
+    ),
+    axis.line.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()
   ) 
 
-annot <- ggplot(data = df_wide) +
-  geom_text(aes(x = biofilm, y = "PN/PS", label = round(PNPS,1))) +
-  scale_fill_gradient(low="white", high="lightgray") +
-  facet_wrap(~extract, nrow=1, strip.position = "top") +
+annot <- ggplot(data = PNPS, aes(x = region, y = avg, fill = "PN/PS")) +
+  geom_col(position = "dodge", width = 0.5) +
+  facet_wrap(~extract) +
+  scale_y_continuous(
+    breaks = c(0, 2, 4)
+    ) +
+  labs(
+    x = "Region",
+    y = NULL, 
+    fill = NULL
+    ) +
+  scale_fill_manual(
+    values = "lightgray",
+    labels = expression(frac(PN, PS))
+  ) +
+  theme_classic(base_size = 12) +
   theme(
-    legend.position = "none",
-    panel.grid  = element_blank(),
-    axis.title  = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks  = element_blank(),
-    strip.text  = element_blank()
+    strip.text  = element_blank(),
+    legend.justification = "left"
   )
 
 p2 <- p / annot +
-  plot_layout(heights = c(4, 1)) 
+  plot_layout(heights = c(4, 1.5))
 
-fname_out <- paste0("./figures/",root_name,"_EPS.png")
-ggsave(fname_out, plot = p2, width = 8, height = 4, dpi = 600)
+fname_out <- "./figures/EPS.png"
+ggsave(fname_out, plot = p2, width = 6.5, height = 3, dpi = 300)
