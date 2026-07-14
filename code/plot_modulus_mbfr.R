@@ -2,7 +2,6 @@ rm(list = ls())
 library(readxl)
 library(tidyverse)
 library(patchwork)
-library(MetBrewer)
 
 fname_in  <- "./data/RheometryApr142026.xlsx"
 fname_out <- "./figures/moduli.png"
