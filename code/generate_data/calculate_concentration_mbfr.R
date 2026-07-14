@@ -6,15 +6,13 @@
 
 rm(list = ls())
 library(tidyverse)
-library(readxl)
 library(ggplot2)
 
 # change to process each sheet
-sheet_name <- "PS"  # protein (PN) or polysaccharide (PS)
+sheet_name <- "PN"  # protein (PN) or polysaccharide (PS)
 
 # File name for absorbance data
-fname_in   <- "./data/EPS_ctr_fresh.xlsx"
-root_name  <- "fresh" # for naming output files
+fname_in   <- "./data/EPS/EPS_ctr_fresh.xlsx"
 
 # Used to convert concentration to include TSS/VSS
 extract_volume = 10 # mL
@@ -55,7 +53,7 @@ sam$C_TSS <- sam$C0*extract_volume/sam$TSS
 #sam$C_VSS <- sam$C0*extract_volume/sam$VSS
 
 # save the sample data
-saveRDS(sam, file = paste0("./data/",root_name,"_",sheet_name,"_conc.rds"))
+saveRDS(sam, file = paste0("./data/EPS/",sheet_name,"_conc.rds"))
 
 
 #### Plot Fit Data
@@ -92,5 +90,5 @@ ggplot() +
   theme_minimal(base_size = 12) +
   theme(aspect.ratio = 0.7)
 
-fit_plot <- paste0("./figures/",root_name,"_",sheet_name,"_fit.png")
+fit_plot <- paste0("./figures/EPS/",sheet_name,"_fit.png")
 ggsave(fit_plot, height = 2.5, width = 6, dpi = 600)
