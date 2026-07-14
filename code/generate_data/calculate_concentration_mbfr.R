@@ -23,7 +23,7 @@ extract_volume = 10 # mL
 # Read in absorbance data
 df <- read_excel(fname_in, sheet = sheet_name, skip = 1) %>%
   mutate(
-    biofilm = recode(biofilm,"B" = "inner","M" = "outer")
+    region = recode(region,"B" = "inner","M" = "outer")
   ) 
 
 # define standards
