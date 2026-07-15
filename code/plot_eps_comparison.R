@@ -5,52 +5,61 @@ library(patchwork)
 # File names for concentration data
 fname_pn_mbfr    <- paste0("./data/EPS/PN_conc_mbfr.rds") 
 fname_polys_mbfr <- paste0("./data/EPS/PS_conc_mbfr.rds") 
-
+fname_pn_ags     <- paste0("./data/EPS/PN_conc_ags.rds") 
+fname_polys_ags  <- paste0("./data/EPS/PS_conc_ags.rds") 
+  
 # Calculate average and std of replicates
 group_data <- function(fname) {
   df <- readRDS(fname) %>%
-    group_by(region, extract) %>% # region
+    rename(.,"biofilm" = if (hasName(., "region")) "region" else "size") %>%
+    group_by(biofilm, extract) %>% # region
     summarize(
       avg = mean(C_TSS),
       sd = sd(C_TSS),
       .groups = "drop"
     ) %>%
     mutate(
-      region = factor(region, levels = c("inner", "outer")),
+      biofilm = factor(biofilm, levels = c("inner", "outer", "XS", "S", "M", "L", "XL", "XXL")),
       extract = recode(extract,"LB" = "Loosely Bound","TB" = "Tightly Bound"),
       extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound"))
-    )
+      )
 }
 # Apply function to each assay
-PN <- group_data(fname_pn_mbfr)
-PS <- group_data(fname_polys_mbfr)
+PN <- bind_rows(
+  group_data(fname_pn_mbfr), 
+  group_data(fname_pn_ags) 
+  )
+PS <- bind_rows(
+  group_data(fname_polys_mbfr),
+  group_data(fname_polys_ags)
+  )
 
 # Calculate PN + PS and PN/PS
 df_wide <- left_join(
-  PN %>% select(region, extract, PN_avg = avg, PN_sd = sd), 
-  PS %>% select(region, extract, PS_avg = avg, PS_sd = sd), 
-  by = c("region", "extract")
-) %>%
+  PN %>% select(biofilm, extract, PN_avg = avg, PN_sd = sd), 
+  PS %>% select(biofilm, extract, PS_avg = avg, PS_sd = sd), 
+  by = c("biofilm", "extract")
+  ) %>%
   mutate(
     total = PN_avg + PS_avg,
     PNPS = PN_avg/PS_avg,
     sd = NA
-  ) 
+    ) 
 
 # Combine into single data frame
 df <- bind_rows(
   'Protein (PN)' = PN,
   'Polysaccharide (PS)' = PS,
-  'Total EPS (PN + PS)' = df_wide %>% select(region, extract, avg = total, sd),
+  'Total EPS (PN + PS)' = df_wide %>% select(biofilm, extract, avg = total, sd),
   .id = "assay"
-) %>%
+  ) %>%
   mutate(
     assay = factor(assay, levels = c("Polysaccharide (PS)", "Protein (PN)", "Total EPS (PN + PS)"))
-  ) 
+    ) 
 
 # Calculate PN/PS
 PNPS <- df_wide %>% 
-  select(region, extract, avg = PNPS) 
+  select(biofilm, extract, avg = PNPS) 
 
 
 # ------ Plot ------
@@ -68,9 +77,9 @@ max_y2 <- df %>%
 
 max_y <- ceiling(
   max(max_y1, max_y2)
-)
+  )
 
-p <- ggplot(data = df, aes(x = region, y = avg, fill = assay)) +
+p <- ggplot(data = df, aes(x = biofilm, y = avg, fill = assay)) +
   geom_col(position = "dodge", width = 0.8) +
   geom_errorbar(
     aes(ymin = avg - sd, ymax = avg + sd),
@@ -101,17 +110,17 @@ p <- ggplot(data = df, aes(x = region, y = avg, fill = assay)) +
     axis.ticks.x = element_blank()
   ) 
 
-annot <- ggplot(data = PNPS, aes(x = region, y = avg, fill = "PN/PS")) +
+annot <- ggplot(data = PNPS, aes(x = biofilm, y = avg, fill = "PN/PS")) +
   geom_col(position = "dodge", width = 0.5) +
   facet_wrap(~extract) +
   scale_y_continuous(
     breaks = c(0, 2, 4)
-  ) +
+    ) +
   labs(
-    x = "Region",
+    x = "Biofilm",
     y = NULL, 
     fill = NULL
-  ) +
+    ) +
   scale_fill_manual(
     values = "lightgray",
     labels = expression(frac(PN, PS))
@@ -126,5 +135,5 @@ annot <- ggplot(data = PNPS, aes(x = region, y = avg, fill = "PN/PS")) +
 p2 <- p / annot +
   plot_layout(heights = c(4, 1.5))
 
-fname_out <- "./figures/EPS.png"
+fname_out <- "./figures/EPS_comparison.png"
 ggsave(fname_out, plot = p2, width = 6.5, height = 3, dpi = 300)
