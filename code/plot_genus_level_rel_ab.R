@@ -1,5 +1,6 @@
 rm(list = ls())
 library(ComplexHeatmap)
+library(MetBrewer)
 source("./code/01_load_ps.R")
 
 # number of rows to show
@@ -94,6 +95,7 @@ ht_colors <- met.brewer(taxa_pal, type = "continuous")
 # Display legend ticks
 breaks_rel_display <- c(0, 0.1, 1, 10, 73) # %
 breaks_log_display <- log10(breaks_rel_display + pseudo) # Log (%)
+breaks_rel_display <- c("0", "0.1", "1", "10", "73%") # %
 
 ht <- Heatmap(
   log_mat,
