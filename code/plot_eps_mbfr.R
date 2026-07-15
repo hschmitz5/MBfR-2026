@@ -1,6 +1,5 @@
 rm(list = ls())
 library(tidyverse)
-library(patchwork)
 library(ggh4x)
 
 # File names for concentration data
