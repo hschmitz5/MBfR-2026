@@ -1,7 +1,7 @@
 rm(list = ls())
 library(tidyverse)
 library(readxl)
-library(patchwork)
+library(cowplot)
 source("./code/01_load_ps.R")
 
 # define sample names
@@ -32,7 +32,7 @@ modulus_subset <- modulus %>%
 
 #### Plot
 
-p <- ggplot(modulus, aes(x = freq_rad, y = avg, color = biofilm)) +
+p1 <- ggplot(modulus, aes(x = freq_rad, y = avg, color = biofilm)) +
   geom_point() +
   geom_line(aes(group = biofilm)) +
   geom_errorbar(
@@ -56,10 +56,7 @@ p <- ggplot(modulus, aes(x = freq_rad, y = avg, color = biofilm)) +
       )
     )
 
-fname_out <- "./figures/moduli.png"
-ggsave(fname_out, plot = p, width = 6.5, height = 2.25, dpi = 300)
-
-p_sub <- ggplot(modulus_subset, aes(x = biofilm, y = avg, fill = measure)) +
+p2 <- ggplot(modulus_subset, aes(x = biofilm, y = avg, fill = measure)) +
   geom_col(position = "dodge", width = 0.6) +
   geom_errorbar(
     aes(ymin = avg - sd, ymax = avg + sd),
@@ -79,5 +76,17 @@ p_sub <- ggplot(modulus_subset, aes(x = biofilm, y = avg, fill = measure)) +
     legend.title = element_blank()
   )
 
-fname_out <- "./figures/moduli_subset.png"
-ggsave(fname_out, plot = p_sub, width = 5, height = 2.25, dpi = 300)
+# arrange two plots into one column
+p <- plot_grid(
+  p1, p2,
+  labels = "AUTO", ncol = 1, rel_widths = c(6.5, 5)
+)
+
+fname_out <- "./figures/moduli.png"
+ggsave(fname_out, plot = p, width = 6.5, height = 5, dpi = 300)
+
+# fname_out <- "./figures/moduli.png"
+# ggsave(fname_out, plot = p1, width = 6.5, height = 2.25, dpi = 300)
+
+# fname_out <- "./figures/moduli_subset.png"
+# ggsave(fname_out, plot = p2, width = 5, height = 2.25, dpi = 300)
