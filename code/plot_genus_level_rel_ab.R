@@ -64,7 +64,7 @@ m_annot <- rowAnnotation(
 )
 # metabolism legend
 lgd <- Legend(
-  title = NULL,
+  title = "Functional\nGroup",
   labels = c("Positive", "Variable"),
   legend_gp = gpar(fill = m_colors),
   nrow = 2,
@@ -93,9 +93,14 @@ row_fontface <- ifelse(italic_rows, "italic", "plain")
 # Legend Colors
 ht_colors <- met.brewer(taxa_pal, type = "continuous")
 # Display legend ticks
-breaks_rel_display <- c(0, 0.1, 1, 10, 73) # %
-breaks_log_display <- log10(breaks_rel_display + pseudo) # Log (%)
-breaks_rel_display <- c("0", "0.1", "1", "10", "73%") # %
+break_values <- c(0, 0.1, 1, 10, 73) # %
+breaks_log_display <- log10(break_values + pseudo) # Log (%)
+# Add % symbol to top break
+breaks_rel_display <- replace(
+  as.character(break_values),
+  length(break_values),
+  paste0(tail(break_values, 1), "%")
+)
 
 ht <- Heatmap(
   log_mat,
@@ -110,9 +115,9 @@ ht <- Heatmap(
   heatmap_legend_param = list(
     at = breaks_log_display,
     labels = breaks_rel_display,
-    title = NULL, #"Log (%)",
-    legend_height = unit(6.5, "cm")
-    # direction = "horizontal"
+    title = "Relative Abundance", 
+    title_position = "leftcenter-rot",
+    legend_height = unit(7, "cm")
   ),
   # Annotations
   right_annotation = m_annot,
@@ -128,11 +133,12 @@ fname_rel <- "./figures/genus_level_rel_ab.png"
 
 # Draw combined heatmap
 png(fname_rel,
-    width = 4.5,  # width in inches; can adjust
-    height = 8, # height in inches; can adjust
+    width = 4,  # width in inches; can adjust
+    height = 5, # height in inches; can adjust
     units = "in", res = 300)
 draw(ht, heatmap_legend_side = "left") 
-draw(lgd, x = unit(0.2, "npc"), y = unit(0.98, "npc"), just = c("right", "top")) # metabolism legend
+# metabolism legend
+draw(lgd, x = unit(0.03, "npc"), y = unit(0.25, "npc"), just = c("left", "top")) 
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
