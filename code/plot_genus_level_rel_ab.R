@@ -138,7 +138,7 @@ png(fname_rel,
     units = "in", res = 300)
 draw(ht, heatmap_legend_side = "left") 
 # metabolism legend
-draw(lgd, x = unit(0.03, "npc"), y = unit(0.25, "npc"), just = c("left", "top")) 
+# draw(lgd, x = unit(0.03, "npc"), y = unit(0.25, "npc"), just = c("left", "top")) 
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
