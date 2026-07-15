@@ -1,6 +1,7 @@
 rm(list = ls())
 library(tidyverse)
 library(patchwork)
+library(ggh4x)
 
 # File names for concentration data
 fname_pn_mbfr    <- paste0("./data/EPS/PN_conc_mbfr.rds") 
@@ -9,7 +10,7 @@ fname_polys_mbfr <- paste0("./data/EPS/PS_conc_mbfr.rds")
 # Calculate average and std of replicates
 group_data <- function(fname) {
   df <- readRDS(fname) %>%
-    group_by(region, extract) %>% # region
+    group_by(extract, region) %>% # region
     summarize(
       avg = mean(C_TSS),
       sd = sd(C_TSS),
@@ -27,10 +28,10 @@ PS <- group_data(fname_polys_mbfr)
 
 # Calculate PN + PS and PN/PS
 df_wide <- left_join(
-  PN %>% select(region, extract, PN_avg = avg, PN_sd = sd), 
-  PS %>% select(region, extract, PS_avg = avg, PS_sd = sd), 
-  by = c("region", "extract")
-) %>%
+  PN %>% select(extract, region, PN_avg = avg, PN_sd = sd), 
+  PS %>% select(extract, region, PS_avg = avg, PS_sd = sd), 
+  by = c("extract", "region")
+  ) %>%
   mutate(
     total = PN_avg + PS_avg,
     PNPS = PN_avg/PS_avg,
@@ -38,93 +39,89 @@ df_wide <- left_join(
   ) 
 
 # Combine into single data frame
-df <- bind_rows(
+df_conc <- bind_rows(
   'Protein (PN)' = PN,
   'Polysaccharide (PS)' = PS,
-  'Total EPS (PN + PS)' = df_wide %>% select(region, extract, avg = total, sd),
+  'Total EPS (PN + PS)' = df_wide %>% select(extract, region, avg = total, sd),
   .id = "assay"
-) %>%
-  mutate(
-    assay = factor(assay, levels = c("Polysaccharide (PS)", "Protein (PN)", "Total EPS (PN + PS)"))
-  ) 
+  ) %>%
+  mutate(plot_type = "\u00b5g/mgTSS") %>%
+  select(plot_type, assay, extract, region, avg, sd) 
 
 # Calculate PN/PS
 PNPS <- df_wide %>% 
-  select(region, extract, avg = PNPS) 
-
+  mutate(
+    plot_type = "PN/PS",
+    assay = "PN/PS",
+    sd = NA
+  ) %>%
+  select(plot_type, assay, extract, region, avg = PNPS, sd) 
+  
+df_all <- bind_rows(df_conc, PNPS) %>%
+  mutate(
+    assay = factor(assay, levels = c("Polysaccharide (PS)", "Protein (PN)", "Total EPS (PN + PS)", "PN/PS"))
+    )
 
 # ------ Plot ------
 
-# Determine maximum avg + sd
-max_y1 <- df %>%
-  filter(assay != "Total EPS (PN + PS)") %>%
-  summarise(max_y = max(avg + sd)) %>%
-  pull(max_y)
 
-max_y2 <- df %>%
-  filter(assay == "Total EPS (PN + PS)") %>%
-  summarise(max_y = max(avg)) %>%
-  pull(max_y)
-
-max_y <- ceiling(
-  max(max_y1, max_y2)
-)
-
-p <- ggplot(data = df, aes(x = region, y = avg, fill = assay)) +
-  geom_col(position = "dodge", width = 0.8) +
+p_test <- ggplot(df_all, aes(x = region, y = avg, fill = assay)) +
+  
+  # Concentration Plots
+  geom_col(
+    data = subset(df_all, plot_type == "\u00b5g/mgTSS"),
+    position = "dodge",
+    width = 0.8
+  ) +
   geom_errorbar(
+    data = subset(df_all, plot_type == "\u00b5g/mgTSS"),
     aes(ymin = avg - sd, ymax = avg + sd),
     position = position_dodge(width = 0.8),
     width = 0.2
   ) +
-  facet_wrap(~extract, scales = "free_y") + 
-  # ylim(0, max_y) +
-  labs(
-    y = expression(paste(mu, "g/mgTSS")),
-    x = NULL,
-    fill = NULL # legend titles
+  
+  # PN/PS plots
+  geom_col(
+    data = subset(df_all, plot_type == "PN/PS"),
+    width = 0.5
   ) +
+  
+  # Sizes
+  facet_grid(
+    plot_type ~ extract,
+    scales = "free_y",
+    switch = "y"
+  ) +
+  facetted_pos_scales(
+    y = list(
+      scale_y_continuous(),                   # Concentration row
+      scale_y_continuous(breaks = c(0, 2.5, 5)) # PN/PS row
+    )
+  ) +
+  force_panelsizes(rows = c(1, 1/3), cols = c(1, 1)) +
+  
   scale_fill_manual(
     values = c(
       "Polysaccharide (PS)" = "lightsalmon2",
-      "Protein (PN)"        = "lightblue",
-      "Total EPS (PN + PS)"      = "steelblue" 
+      "Protein (PN)" = "lightblue",
+      "Total EPS (PN + PS)" = "steelblue",
+      "PN/PS" = "lightgray"
     )
   ) +
-  theme_classic(base_size = 12) +
-  theme(
-    strip.background = element_rect(
-      colour = NA # facet label outline
-    ),
-    axis.line.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()
-  ) 
-
-annot <- ggplot(data = PNPS, aes(x = region, y = avg, fill = "PN/PS")) +
-  geom_col(position = "dodge", width = 0.5) +
-  facet_wrap(~extract) +
-  scale_y_continuous(
-    breaks = c(0, 2, 4)
-  ) +
+  
   labs(
     x = "Region",
-    y = NULL, 
+    y = NULL,
     fill = NULL
   ) +
-  scale_fill_manual(
-    values = "lightgray",
-    labels = expression(frac(PN, PS))
-  ) +
+  
   theme_classic(base_size = 12) +
   theme(
-    strip.text  = element_blank(),
-    legend.justification = "left",
-    axis.text.x = element_text(angle = 45, hjust = 1)
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.placement = "outside",
+    strip.background = element_blank()
   )
 
-p2 <- p / annot +
-  plot_layout(heights = c(4, 1.5))
 
 fname_out <- "./figures/EPS.png"
-ggsave(fname_out, plot = p2, width = 6.5, height = 3, dpi = 300)
+ggsave(fname_out, plot = p_test, width = 6.5, height = 3, dpi = 300)
