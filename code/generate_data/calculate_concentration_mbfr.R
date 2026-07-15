@@ -54,7 +54,7 @@ sam$C_TSS <- sam$C0*extract_volume/sam$TSS
 #sam$C_VSS <- sam$C0*extract_volume/sam$VSS
 
 # save the sample data
-saveRDS(sam, file = paste0("./data/EPS/",sheet_name,"_conc.rds"))
+saveRDS(sam, file = paste0("./data/EPS/",sheet_name,"_conc_mbfr.rds"))
 
 
 #### Plot Fit Data
