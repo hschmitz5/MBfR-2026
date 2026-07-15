@@ -64,7 +64,7 @@ df_all <- bind_rows(df_conc, PNPS) %>%
 # ------ Plot ------
 
 
-p_test <- ggplot(df_all, aes(x = region, y = avg, fill = assay)) +
+p <- ggplot(df_all, aes(x = region, y = avg, fill = assay)) +
   
   # Concentration Plots
   geom_col(
@@ -123,4 +123,4 @@ p_test <- ggplot(df_all, aes(x = region, y = avg, fill = assay)) +
 
 
 fname_out <- "./figures/EPS.png"
-ggsave(fname_out, plot = p_test, width = 6.5, height = 3, dpi = 300)
+ggsave(fname_out, plot = p, width = 6.5, height = 3, dpi = 300)
