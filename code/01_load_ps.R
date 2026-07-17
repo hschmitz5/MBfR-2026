@@ -2,8 +2,6 @@ suppressPackageStartupMessages({
   # ---- Load Packages ----
   library(tidyverse)
   library(phyloseq)
-  # formatting figures
-  library(patchwork)
 })
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
 
