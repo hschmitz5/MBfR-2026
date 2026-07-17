@@ -8,7 +8,6 @@ source("./code/02_sum_rel_ab_by_function.R")
 write2excel <- 0
 
 metab_order <- c("Methanogen", "Filamentous")
-n_rows <- length(metab_order)
 
 rel_ab_df <- sum_rel_ab_by_function(ps) %>%
   mutate(
