@@ -27,7 +27,8 @@ group_data <- function(fname) {
       exp_category = factor(exp_category, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL")),
       extract = recode(extract,"LB" = "Loosely Bound","TB" = "Tightly Bound"),
       extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound")),
-      biofilm = biofilm$type[as.numeric(exp_category)]
+      biofilm = biofilm$type[as.numeric(exp_category)],
+      biofilm = factor(biofilm, levels = c("MBfR", "AGS"))
       )
 }
 # Apply function to each assay
@@ -79,8 +80,6 @@ df_all <- bind_rows(df_conc, PNPS) %>%
 
 # ------ Plot ------
 
-x_color <- ifelse(biofilm$type == "AGS", "black", "red")
-
 p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   
   # Concentration Plots
@@ -103,21 +102,27 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   ) +
   
   # Sizes
-  ggh4x::facet_grid2(
-    y_label ~ extract,
+  # ggh4x::facet_grid2(
+  ggh4x::facet_nested(
+    y_label ~ extract + biofilm,
     scales = "free",
-    switch = "y",
-    independent = "y"
+    independent = "y",
+    switch = "y" 
   ) +
   facetted_pos_scales(
     y = list(
-      scale_y_continuous(),   
-      scale_y_continuous(), 
-      scale_y_continuous(breaks = c(0, 2.5, 5)), # PN/PS row
-      scale_y_continuous(breaks = c(0, 2.5, 5))  # PN/PS row
+      scale_y_continuous(limits = c(0, 80)),
+      scale_y_continuous(limits = c(0, 80)),
+      scale_y_continuous(limits = c(0, 15)),
+      scale_y_continuous(limits = c(0, 15)),
+      # PN/PS rows
+      scale_y_continuous(breaks = c(0, 2.5, 5)), 
+      scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5)),  
+      scale_y_continuous(breaks = c(0, 2.5, 5)), 
+      scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5))
     )
   ) +
-  force_panelsizes(rows = c(1, 1/3), cols = c(1, 1)) +
+  force_panelsizes(rows = c(1, 1/3), cols = c(1/3, 1, 1/3, 1)) +
   
   scale_fill_manual(
     values = c(
@@ -136,7 +141,7 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   
   theme_classic(base_size = 12) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, color = x_color),
+    axis.text.x = element_text(angle = 45, hjust = 1), 
     strip.placement = "outside",
     strip.background = element_blank()
   )
