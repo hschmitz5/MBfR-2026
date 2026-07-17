@@ -3,13 +3,13 @@
 
 rm(list = ls())
 source("./code/01_load_ps.R")
-source("./code/02_sum_rel_ab_by_function.R")
+source("./code/02_sum_rel_ab_by_function_mbfr.R")
 
 write2excel <- 0
 
 metab_order <- c("Methanogen", "Filamentous")
 
-rel_ab_df <- sum_rel_ab_by_function(ps) %>%
+rel_ab_df <- sum_rel_ab_by_function_mbfr(ps) %>%
   mutate(
     metab = factor(metab, levels = metab_order)
   )
@@ -27,7 +27,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum, fill = metab_val)) +
   facet_wrap(~metab, scales = "fixed") +
   labs(
     y = "Relative\nAbundance (%)",
-    x = "Size"
+    x = "Region"
   ) +
   scale_fill_manual(
     name = "Functional Group",
