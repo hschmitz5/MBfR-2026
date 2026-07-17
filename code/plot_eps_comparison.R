@@ -122,7 +122,7 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
       scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5))
     )
   ) +
-  force_panelsizes(rows = c(1, 1/3), cols = c(1/3, 1, 1/3, 1)) +
+  force_panelsizes(rows = c(1, 1/3), cols = c(0.4, 1, 0.4, 1)) +
   
   scale_fill_manual(
     values = c(
