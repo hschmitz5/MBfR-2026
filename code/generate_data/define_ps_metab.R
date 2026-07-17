@@ -53,7 +53,7 @@ agglom_metab <- function(taxa_list) {
 }
 
 ps_metab_P <- agglom_metab(taxa_P)
-saveRDS(ps_metab_P, file = "./data/phyloseq/ps_metab_P.rds")
+saveRDS(ps_metab_P, file = "./data/phyloseq/ps_metab_P_mbfr.rds")
 
 ps_metab_PV <- agglom_metab(taxa_PV)
-saveRDS(ps_metab_PV, file = "./data/phyloseq/ps_metab_PV.rds")
+saveRDS(ps_metab_PV, file = "./data/phyloseq/ps_metab_PV_mbfr.rds")
