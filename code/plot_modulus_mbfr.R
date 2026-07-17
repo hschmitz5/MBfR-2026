@@ -5,7 +5,7 @@ library(cowplot)
 source("./code/01_load_ps.R")
 
 # define sample names
-biofilm_levels <- c("inner", "outer", "XS")
+biofilm_levels <- c("MBfR: inner", "MBfR: outer", "AGS: floccular")
 
 fname_in <- "./data/RheometryApr142026.xlsx"
 modulus <- read_excel(fname_in, sheet = "input", skip = 1) %>%
@@ -42,7 +42,7 @@ p1 <- ggplot(modulus, aes(x = freq_rad, y = avg, color = biofilm)) +
   facet_wrap(~measure, scales = "free_y", nrow = 1) +
   scale_color_manual(
     name = "Biofilm",
-    values = c("inner" = "steelblue", "outer" = "lightsalmon2", "XS" = "black")
+    values = c("MBfR: inner" = "steelblue", "MBfR: outer" = "lightsalmon2", "AGS: floccular" = "black")
   ) +
   labs(
     x = "Frequency (rad/s)",
