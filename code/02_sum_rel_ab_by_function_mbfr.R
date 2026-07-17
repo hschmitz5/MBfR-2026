@@ -1,7 +1,7 @@
 # NOTE: Using all data, not just top n_show
 # This is to verify that major metabolic groups are not being dropped
 
-sum_rel_ab_by_function <- function(ps) {
+sum_rel_ab_by_function_mbfr <- function(ps) {
   
   # Define relative abundance
   rel <- get_rel(ps) 
