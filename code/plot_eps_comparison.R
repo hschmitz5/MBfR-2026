@@ -111,10 +111,10 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   ) +
   facetted_pos_scales(
     y = list(
-      scale_y_continuous(limits = c(0, 80)),
-      scale_y_continuous(limits = c(0, 80)),
-      scale_y_continuous(limits = c(0, 15)),
-      scale_y_continuous(limits = c(0, 15)),
+      scale_y_continuous(limits = c(0, 80)), # TB MBfR
+      scale_y_continuous(limits = c(0, 80)), # TB AGS
+      scale_y_continuous(limits = c(0, 15)), # LB MBfR
+      scale_y_continuous(limits = c(0, 15)), # LB AGS
       # PN/PS rows
       scale_y_continuous(breaks = c(0, 2.5, 5)), 
       scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5)),  
