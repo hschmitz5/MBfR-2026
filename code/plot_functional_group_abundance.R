@@ -26,7 +26,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum, fill = metab_val)) +
     width = 0.2,
     position = position_dodge(width = 0.6)
   ) +
-  facet_wrap(~metab, scales = "free_y") +
+  facet_wrap(~metab, scales = "fixed") +
   labs(
     y = "Relative\nAbundance (%)",
     x = "Size"
@@ -38,8 +38,6 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum, fill = metab_val)) +
   ) +
   theme_classic(base_size = 12) +
   theme(
-    # plot.title = element_text(hjust = 0.5), # center title
-    # legend.position = "bottom",
     strip.background = element_rect(
       colour = NA # facet label outline
     )
