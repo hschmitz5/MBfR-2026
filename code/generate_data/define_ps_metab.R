@@ -3,7 +3,7 @@ library(readxl)
 library(tidyverse)
 library(phyloseq)
 
-sam_name <- c("inner", "outer")
+sam_name <- c("Inner", "Outer")
 
 # load phyloseq object (absolute counts)
 ps <- readRDS("./data/phyloseq/ps_genus.rds")
@@ -18,7 +18,7 @@ otu_df <- as.data.frame(as.matrix(otu_table(ps))) %>%
   dplyr::select(Genus, all_of(sam_name))
 
 # Metabolism input file
-metab_fname <- "./data/metabolism_midas.xlsx"
+metab_fname <- "./data/metabolism_midas_mbfr.xlsx"
 
 m <- read_excel(metab_fname, sheet = "input") %>%
   column_to_rownames("Genus")
