@@ -8,20 +8,26 @@ fname_polys_mbfr <- paste0("./data/EPS/PS_conc_mbfr.rds")
 fname_pn_ags     <- paste0("./data/EPS/PN_conc_ags.rds") 
 fname_polys_ags  <- paste0("./data/EPS/PS_conc_ags.rds") 
   
+biofilm <- data.frame(
+  exp_category = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL"),
+  type = c("MBfR", "MBfR", "AGS", "AGS", "AGS", "AGS", "AGS", "AGS")
+  )
+
 # Calculate average and std of replicates
 group_data <- function(fname) {
   df <- readRDS(fname) %>%
-    rename(.,"biofilm" = if (hasName(., "region")) "region" else "size") %>%
-    group_by(extract, biofilm) %>% # region
+    rename(.,"exp_category" = if (hasName(., "region")) "region" else "size") %>%
+    group_by(extract, exp_category) %>% # region
     summarize(
       avg = mean(C_TSS),
       sd = sd(C_TSS),
       .groups = "drop"
     ) %>%
     mutate(
-      biofilm = factor(biofilm, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL")),
+      exp_category = factor(exp_category, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL")),
       extract = recode(extract,"LB" = "Loosely Bound","TB" = "Tightly Bound"),
-      extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound"))
+      extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound")),
+      biofilm = biofilm$type[as.numeric(exp_category)]
       )
 }
 # Apply function to each assay
@@ -36,9 +42,9 @@ PS <- bind_rows(
 
 # Calculate PN + PS and PN/PS
 df_wide <- left_join(
-  PN %>% select(extract, biofilm, PN_avg = avg, PN_sd = sd), 
-  PS %>% select(extract, biofilm, PS_avg = avg, PS_sd = sd), 
-  by = c("extract", "biofilm")
+  PN %>% select(extract, biofilm, exp_category, PN_avg = avg, PN_sd = sd), 
+  PS %>% select(extract, biofilm, exp_category, PS_avg = avg, PS_sd = sd), 
+  by = c("extract", "biofilm", "exp_category")
   ) %>%
   mutate(
     total = PN_avg + PS_avg,
@@ -50,11 +56,11 @@ df_wide <- left_join(
 df_conc <- bind_rows(
   'Protein (PN)' = PN,
   'Polysaccharide (PS)' = PS,
-  'Total EPS (PN + PS)' = df_wide %>% select(extract, biofilm, avg = total, sd),
+  'Total EPS (PN + PS)' = df_wide %>% select(extract, biofilm, exp_category, avg = total, sd),
   .id = "assay"
   ) %>%
   mutate(y_label = "\u00b5g/mgTSS") %>%
-  select(y_label, assay, extract, biofilm, avg, sd) 
+  select(y_label, assay, extract, biofilm, exp_category, avg, sd) 
 
 # Calculate PN/PS
 PNPS <- df_wide %>% 
@@ -63,7 +69,7 @@ PNPS <- df_wide %>%
     assay = "PN/PS",
     sd = NA
   ) %>%
-  select(y_label, assay, extract, biofilm, avg = PNPS, sd) 
+  select(y_label, assay, extract, biofilm, exp_category, avg = PNPS, sd) 
 
 df_all <- bind_rows(df_conc, PNPS) %>%
   mutate(
@@ -73,8 +79,9 @@ df_all <- bind_rows(df_conc, PNPS) %>%
 
 # ------ Plot ------
 
+x_color <- ifelse(biofilm$type == "AGS", "black", "red")
 
-p <- ggplot(df_all, aes(x = biofilm, y = avg, fill = assay)) +
+p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   
   # Concentration Plots
   geom_col(
@@ -129,7 +136,7 @@ p <- ggplot(df_all, aes(x = biofilm, y = avg, fill = assay)) +
   
   theme_classic(base_size = 12) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text.x = element_text(angle = 45, hjust = 1, color = x_color),
     strip.placement = "outside",
     strip.background = element_blank()
   )
