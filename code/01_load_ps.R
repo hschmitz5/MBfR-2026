@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRU
 # load phyloseq object (absolute counts)
 ps <- readRDS("./data/phyloseq/ps_genus.rds")
 
-sam_name <- c("inner", "outer")
+sam_name <- c("Inner", "Outer")
 
 # Metabolism input file
 metab_fname <- "./data/metabolism_midas_mbfr.xlsx"
