@@ -11,7 +11,6 @@ metab_order <- c("Methanogen", "Filamentous")
 n_rows <- length(metab_order)
 
 rel_ab_df <- sum_rel_ab_by_function(ps) %>%
-  filter(metab %in% metab_order) %>%
   mutate(
     metab = factor(metab, levels = metab_order)
   )
