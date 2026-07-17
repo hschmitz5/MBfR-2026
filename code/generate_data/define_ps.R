@@ -20,8 +20,8 @@ ps <- prune_samples(keep, ps_full)
 
 # Rename samples
 region_names <- c(
-  "c_AC" = "outer",
-  "c_ACb" = "inner"
+  "c_AC" = "Outer",
+  "c_ACb" = "Inner"
 )
 
 # rename sample names
