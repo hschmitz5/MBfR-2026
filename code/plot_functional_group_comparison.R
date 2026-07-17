@@ -28,6 +28,7 @@ rel_ab_ags <- sum_rel_ab_by_function_ags(ps_ags) %>%
   mutate(biofilm = "AGS")
 
 rel_ab_df <- bind_rows(rel_ab_mbfr, rel_ab_ags) %>%
+  filter(metab_val == "Positive") %>%
   mutate(
     biofilm = factor(biofilm, levels = c("MBfR", "AGS")),
     exp_category = factor(exp_category, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL"))
@@ -35,9 +36,9 @@ rel_ab_df <- bind_rows(rel_ab_mbfr, rel_ab_ags) %>%
 
 # ------------ Plot ------------------
 
-
-p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum, fill = metab_val)) +
-  geom_col(position = "dodge", width = 0.6) +
+p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +
+# p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum, fill = metab_val)) +
+  geom_col(position = "dodge", width = 0.6, fill = "steelblue") +
   geom_errorbar(
     aes(ymin = mean_sum - sd_sum, ymax = mean_sum + sd_sum),
     width = 0.2,
@@ -46,15 +47,15 @@ p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum, fill = metab_val)) +
   facet_wrap(~biofilm, scales = "free") +
   force_panelsizes(cols = c(0.4, 1)) +
   labs(
-    title = "Filamentous",
+    title = "Positive Filamentous",
     y = "Relative\nAbundance (%)",
-    x = "Size"
+    x = "Biofilm"
   ) +
-  scale_fill_manual(
-    name = "Functional Group",
-    values = c("Positive" = "steelblue",
-               "Positive + Variable" = "lightgray")
-  ) +
+  # scale_fill_manual(
+  #   name = "Functional Group",
+  #   values = c("Positive" = "steelblue",
+  #              "Positive + Variable" = "lightgray")
+  # ) +
   theme_classic(base_size = 12) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1), 
