@@ -7,7 +7,7 @@ source("./code/02_sum_rel_ab_by_function_mbfr.R")
 
 write2excel <- 0
 
-metab_order <- c("Methanogen", "Acetogen", "Fermentation", "Filamentous")
+metab_order <- c("Methanogen", "Fermentation", "Filamentous")
 
 rel_ab_df <- sum_rel_ab_by_function_mbfr(ps) %>%
   filter(metab_val == "Positive") %>%
