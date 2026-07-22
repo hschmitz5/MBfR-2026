@@ -36,8 +36,7 @@ rel_ab_df <- bind_rows(rel_ab_mbfr, rel_ab_ags) %>%
 
 # ------------ Plot ------------------
 
-p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +
-# p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum, fill = metab_val)) +
+p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +  # fill = metab_val)) +
   geom_col(position = "dodge", width = 0.6, fill = "steelblue") +
   geom_errorbar(
     aes(ymin = mean_sum - sd_sum, ymax = mean_sum + sd_sum),
@@ -47,7 +46,6 @@ p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +
   facet_wrap(~biofilm, scales = "free") +
   force_panelsizes(cols = c(0.4, 1)) +
   labs(
-    title = "Positive Filamentous",
     y = "Relative\nAbundance (%)",
     x = "Biofilm"
   ) +
