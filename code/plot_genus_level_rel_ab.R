@@ -125,7 +125,7 @@ ht <- Heatmap(
     labels = breaks_rel_display,
     title = "Relative Abundance", 
     title_position = "leftcenter-rot",
-    legend_height = unit(7, "cm")
+    legend_height = unit(7.5, "cm")
   ),
   # Annotations
   right_annotation = m_annot,
