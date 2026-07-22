@@ -133,7 +133,7 @@ ht <- Heatmap(
   width  = unit(n_cols * cell_w, "inches"),
   height = unit(n_rows * cell_h, "inches"),
   row_names_gp = gpar(fontsize = row_fontsize, fontface = row_fontface),
-  column_names_gp = gpar(fontsize = col_fontsize)
+  column_names_gp = gpar(fontsize = col_fontsize, fontface = "bold")
 )
 
 # Figure output location
@@ -141,8 +141,8 @@ fname_rel <- "./figures/genus_level_rel_ab.png"
 
 # Draw combined heatmap
 png(fname_rel,
-    width = 4,  # width in inches; can adjust
-    height = 5, # height in inches; can adjust
+    width = 4.4,  # width in inches; can adjust
+    height = 5.25, # height in inches; can adjust
     units = "in", res = 300)
 draw(ht, heatmap_legend_side = "left") 
 # metabolism legend
