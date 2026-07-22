@@ -7,11 +7,11 @@ fname_pn_mbfr    <- paste0("./data/EPS/PN_conc_mbfr.rds")
 fname_polys_mbfr <- paste0("./data/EPS/PS_conc_mbfr.rds") 
 fname_pn_ags     <- paste0("./data/EPS/PN_conc_ags.rds") 
 fname_polys_ags  <- paste0("./data/EPS/PS_conc_ags.rds") 
-  
+
 biofilm <- data.frame(
   exp_category = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL"),
   type = c("MBfR", "MBfR", "AGS", "AGS", "AGS", "AGS", "AGS", "AGS")
-  )
+)
 
 # Calculate average and std of replicates
 group_data <- function(fname) {
@@ -29,29 +29,29 @@ group_data <- function(fname) {
       extract = factor(extract, levels = c("Tightly Bound", "Loosely Bound")),
       biofilm = biofilm$type[as.numeric(exp_category)],
       biofilm = factor(biofilm, levels = c("MBfR", "AGS"))
-      )
+    )
 }
 # Apply function to each assay
 PN <- bind_rows(
   group_data(fname_pn_mbfr), 
   group_data(fname_pn_ags) 
-  )
+)
 PS <- bind_rows(
   group_data(fname_polys_mbfr),
   group_data(fname_polys_ags)
-  )
+)
 
 # Calculate PN + PS and PN/PS
 df_wide <- left_join(
   PN %>% select(extract, biofilm, exp_category, PN_avg = avg, PN_sd = sd), 
   PS %>% select(extract, biofilm, exp_category, PS_avg = avg, PS_sd = sd), 
   by = c("extract", "biofilm", "exp_category")
-  ) %>%
+) %>%
   mutate(
     total = PN_avg + PS_avg,
     PNPS = PN_avg/PS_avg,
     sd = NA
-    ) 
+  ) 
 
 # Combine into single data frame
 df_conc <- bind_rows(
@@ -59,7 +59,7 @@ df_conc <- bind_rows(
   'Polysaccharide (PS)' = PS,
   'Total EPS (PN + PS)' = df_wide %>% select(extract, biofilm, exp_category, avg = total, sd),
   .id = "assay"
-  ) %>%
+) %>%
   mutate(y_label = "\u00b5g/mgTSS") %>%
   select(y_label, assay, extract, biofilm, exp_category, avg, sd) 
 
@@ -104,25 +104,26 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
   # Sizes
   # ggh4x::facet_grid2(
   ggh4x::facet_nested(
-    y_label ~ extract + biofilm,
+    extract + y_label ~ biofilm,
     scales = "free",
     independent = "y",
-    switch = "y" 
+    switch = "y"
   ) +
   facetted_pos_scales(
     y = list(
+      # TB
       scale_y_continuous(limits = c(0, 80)), # TB MBfR
       scale_y_continuous(limits = c(0, 80)), # TB AGS
+      scale_y_continuous(breaks = c(0, 2.5, 5)),
+      scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5)),
+      # LB
       scale_y_continuous(limits = c(0, 15)), # LB MBfR
       scale_y_continuous(limits = c(0, 15)), # LB AGS
-      # PN/PS rows
-      scale_y_continuous(breaks = c(0, 2.5, 5)), 
-      scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5)),  
-      scale_y_continuous(breaks = c(0, 2.5, 5)), 
+      scale_y_continuous(breaks = c(0, 2.5, 5)),
       scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5))
     )
   ) +
-  force_panelsizes(rows = c(1, 1/3), cols = c(0.4, 1, 0.4, 1)) +
+  force_panelsizes(cols = c(1/3, 1), rows = c(1, 0.4, 1, 0.4)) +
   
   scale_fill_manual(
     values = c(
@@ -148,4 +149,4 @@ p <- ggplot(df_all, aes(x = exp_category, y = avg, fill = assay)) +
 
 
 fname_out <- "./figures/EPS_comparison.png"
-ggsave(fname_out, plot = p, width = 6.5, height = 3, dpi = 300)
+ggsave(fname_out, plot = p, width = 6.5, height = 6, dpi = 300)
