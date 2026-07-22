@@ -1,5 +1,6 @@
 rm(list = ls())
 library(ComplexHeatmap)
+library(circlize) # for colorRamp2
 library(MetBrewer)
 source("./code/01_load_ps.R")
 
@@ -51,8 +52,8 @@ m_colors  <- c("P" = "#66C24A", "V" = "#EAEC3F")
 m_annot <- rowAnnotation(
   df = m_df,
   # column names
-  annotation_name_side = "bottom",
-  annotation_name_rot = -60,
+  annotation_name_side = "top",
+  annotation_name_rot = 60,
   # color
   col = col_list <- setNames(
     rep(list(m_colors), ncol(m_df)),
@@ -64,7 +65,7 @@ m_annot <- rowAnnotation(
 )
 # metabolism legend
 lgd <- Legend(
-  title = "Functional\nGroup",
+  title = "Functional Group",
   labels = c("Positive", "Variable"),
   legend_gp = gpar(fill = m_colors),
   nrow = 2,
@@ -91,7 +92,14 @@ italic_rows <- !grepl("^(Unk|midas)", row_labels)
 row_fontface <- ifelse(italic_rows, "italic", "plain")
 
 # Legend Colors
-ht_colors <- met.brewer(taxa_pal, type = "continuous")
+ht_colors <- colorRamp2(
+  breaks <- seq(
+    -1.12, # min(log_mat)
+    max(log_mat),
+    length.out = 10
+  ), 
+  met.brewer(taxa_pal, 10)
+)
 # Display legend ticks
 break_values <- c(0, 0.1, 1, 10, 73) # %
 breaks_log_display <- log10(break_values + pseudo) # Log (%)
@@ -105,8 +113,8 @@ breaks_rel_display <- replace(
 ht <- Heatmap(
   log_mat,
   # columns
-  show_column_names = TRUE,  
-  column_names_rot = -60,
+  column_names_side = "top",
+  column_names_rot = 60,
   column_title = NULL, #"Relative Abundance",
   cluster_columns = FALSE, # changes sample order
   # heatmap legend
@@ -138,7 +146,7 @@ png(fname_rel,
     units = "in", res = 300)
 draw(ht, heatmap_legend_side = "left") 
 # metabolism legend
-# draw(lgd, x = unit(0.03, "npc"), y = unit(0.25, "npc"), just = c("left", "top")) 
+draw(lgd, x = unit(0.95, "npc"), y = unit(0.95, "npc"), just = c("right", "top"))
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
