@@ -79,7 +79,7 @@ p2 <- ggplot(modulus_subset, aes(x = biofilm, y = avg, fill = measure)) +
 # arrange two plots into one column
 p <- plot_grid(
   p1, p2,
-  labels = "AUTO", ncol = 1, rel_widths = c(6.5, 5)
+  labels = "auto", ncol = 1, rel_widths = c(6.5, 5)
 )
 
 fname_out <- "./figures/moduli.png"
