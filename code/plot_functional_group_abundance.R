@@ -7,7 +7,7 @@ source("./code/02_sum_rel_ab_by_function_mbfr.R")
 
 write2excel <- 0
 
-metab_order <- c("Methanogen", "Filamentous")
+metab_order <- c("Methanogen", "Acetogen", "Fermentation", "Filamentous")
 
 rel_ab_df <- sum_rel_ab_by_function_mbfr(ps) %>%
   filter(metab_val == "Positive") %>%
@@ -25,7 +25,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
     width = 0.2,
     position = position_dodge(width = 0.6)
   ) +
-  facet_wrap(~metab, scales = "free_y") +
+  facet_wrap(~metab, scales = "free_y", nrow = 1) +
   labs(
     y = "Relative\nAbundance (%)",
     x = "Region"
