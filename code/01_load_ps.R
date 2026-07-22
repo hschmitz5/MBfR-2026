@@ -2,6 +2,8 @@ suppressPackageStartupMessages({
   # ---- Load Packages ----
   library(tidyverse)
   library(phyloseq)
+  # colors
+  library(MetBrewer) 
 })
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
 
