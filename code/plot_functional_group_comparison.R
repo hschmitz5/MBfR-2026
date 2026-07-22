@@ -46,6 +46,7 @@ p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +  # fill = metab_va
   facet_wrap(~biofilm, scales = "free") +
   force_panelsizes(cols = c(0.4, 1)) +
   labs(
+    title = "Filamentous",
     y = "Relative\nAbundance (%)",
     x = "Biofilm"
   ) +
