@@ -11,7 +11,7 @@ write2excel <- 0
 
 # Cell height in inches (adjust as needed)
 cell_h <- 0.2
-cell_w <- 0.2 
+cell_w <- 0.6
 
 # Font sizes
 row_fontsize <- 10
@@ -51,6 +51,7 @@ m_df <- rel_df %>%
 m_colors  <- c("P" = "#66C24A", "V" = "#EAEC3F")
 m_annot <- rowAnnotation(
   df = m_df,
+  gap = unit(2, "mm"),
   # column names
   annotation_name_side = "top",
   annotation_name_rot = 60,
@@ -64,12 +65,12 @@ m_annot <- rowAnnotation(
   show_legend = FALSE
 )
 # metabolism legend
-lgd <- Legend(
+metab_lgd <- Legend(
   title = "Functional Group",
   labels = c("Positive", "Variable"),
   legend_gp = gpar(fill = m_colors),
-  nrow = 2,
-  row_gap = unit(3, "mm")
+  nrow = 1,
+  title_gap = unit(3, "mm")
 )
 
 ## Relative Abundance
@@ -114,7 +115,8 @@ ht <- Heatmap(
   log_mat,
   # columns
   column_names_side = "top",
-  column_names_rot = 60,
+  column_names_centered = TRUE,
+  column_names_rot = 0,
   column_title = NULL, #"Relative Abundance",
   cluster_columns = FALSE, # changes sample order
   # heatmap legend
@@ -141,12 +143,12 @@ fname_rel <- "./figures/genus_level_rel_ab.png"
 
 # Draw combined heatmap
 png(fname_rel,
-    width = 4.4,  # width in inches; can adjust
-    height = 5.25, # height in inches; can adjust
+    width = 5.5,  # width in inches; can adjust
+    height = 6.3, # height in inches; can adjust
     units = "in", res = 300)
 draw(ht, heatmap_legend_side = "left") 
 # metabolism legend
-draw(lgd, x = unit(0.95, "npc"), y = unit(0.95, "npc"), just = c("right", "top"))
+draw(metab_lgd, x = unit(0.26, "npc"), y = unit(0.03, "npc"), just = c("left", "bottom"))
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
