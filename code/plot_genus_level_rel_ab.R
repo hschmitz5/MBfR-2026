@@ -92,23 +92,23 @@ italic_rows <- !grepl("^(Unk|midas)", row_labels)
 # Apply
 row_fontface <- ifelse(italic_rows, "italic", "plain")
 
-# Legend Colors
-ht_colors <- colorRamp2(
-  breaks <- seq(
-    -1.12, # min(log_mat)
-    max(log_mat),
-    length.out = 10
-  ), 
-  met.brewer(taxa_pal, 10)
-)
-# Display legend ticks
-break_values <- c(0, 0.1, 1, 10, 73) # %
-breaks_log_display <- log10(break_values + pseudo) # Log (%)
-# Add % symbol to top break
+# Relative Abundance legend 
+break_values <- c(round(min(rel_df),1), 1, 10, round(ceiling(max(rel_df)))) 
+breaks_log_display <- log10(break_values) # Log (%)
+# Add % symbol to largest break
 breaks_rel_display <- replace(
   as.character(break_values),
   length(break_values),
   paste0(tail(break_values, 1), "%")
+)
+# Legend Colors
+ht_colors <- colorRamp2(
+  breaks <- seq(
+    log10(break_values[1]),
+    log10(tail(break_values, 1)),
+    length.out = 10
+  ), 
+  met.brewer(taxa_pal, 10)
 )
 
 ht <- Heatmap(
