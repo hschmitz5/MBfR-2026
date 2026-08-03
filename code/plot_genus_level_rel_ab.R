@@ -70,6 +70,7 @@ metab_lgd <- Legend(
   labels = c("Positive", "Variable"),
   legend_gp = gpar(fill = m_colors),
   nrow = 1,
+  title_position = "leftcenter",
   title_gap = unit(3, "mm")
 )
 
@@ -111,6 +112,15 @@ ht_colors <- colorRamp2(
   met.brewer(taxa_pal, 10)
 )
 
+heatmap_lgd <- Legend(
+  col_fun = ht_colors,
+  labels = breaks_rel_display,
+  at = breaks_log_display,
+  title = "Relative Abundance",
+  direction = "horizontal",
+  legend_width = unit(6.7, "cm")
+)
+
 ht <- Heatmap(
   log_mat,
   # columns
@@ -121,14 +131,7 @@ ht <- Heatmap(
   cluster_columns = FALSE, # changes sample order
   # heatmap legend
   col = ht_colors, 
-  show_heatmap_legend = TRUE, 
-  heatmap_legend_param = list(
-    at = breaks_log_display,
-    labels = breaks_rel_display,
-    title = "Relative Abundance", 
-    title_position = "leftcenter-rot",
-    legend_height = unit(7.5, "cm")
-  ),
+  show_heatmap_legend = FALSE, 
   # Annotations
   right_annotation = m_annot,
   # Display size
@@ -138,17 +141,19 @@ ht <- Heatmap(
   column_names_gp = gpar(fontsize = col_fontsize, fontface = "bold")
 )
 
+pd = packLegend(heatmap_lgd, metab_lgd, direction = "horizontal", 
+                max_width = unit(10, "cm"), row_gap = unit(5, "mm"))
+
 # Figure output location
 fname_rel <- "./figures/genus_level_rel_ab.png"
 
 # Draw combined heatmap
 png(fname_rel,
-    width = 5.5,  # width in inches; can adjust
-    height = 6.3, # height in inches; can adjust
+    width = 4.5,  # width in inches; can adjust
+    height = 7.5, # height in inches; can adjust
     units = "in", res = 300)
-draw(ht, heatmap_legend_side = "left") 
-# metabolism legend
-draw(metab_lgd, x = unit(0.26, "npc"), y = unit(0.03, "npc"), just = c("left", "bottom"))
+draw(ht) 
+draw(pd, x = unit(0.13, "npc"), y = unit(0.03, "npc"), just = c("left", "bottom"))
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
