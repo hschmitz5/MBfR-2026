@@ -1,7 +1,7 @@
 rm(list = ls())
 library(ComplexHeatmap)
 library(circlize) # for colorRamp2
-source("./code/R/01_load_ps.R")
+source("./code/01_load_ps.R")
 
 # number of rows to show
 n_show <- 20 
@@ -9,7 +9,9 @@ n_show <- 20
 write2excel <- 0
 
 # load phyloseq object (absolute counts)
-ps <- readRDS("./data/phyloseq/ps_genus_full.rds")
+ps <- readRDS("./data/phyloseq/ps_genus_full_AGS.rds")
+
+metab_fname <- "./data/metabolism_midas_ags.xlsx"
 
 # For ordering
 sam_name <- c("40A", "40B", "40C", "20A", "20B", "20C", "14A", "14B", "14C", 
@@ -22,6 +24,7 @@ size <- data.frame(
 size$name <- recode(size$name, "Floccular" = "Floc")
 
 n_sizes <- length(levels(ps@sam_data$size.mm))
+n_replicates <- 3
 
 # Cell height in inches (adjust as needed)
 cell_h <- 0.2
@@ -59,7 +62,7 @@ m_df <- rel_df %>%
   get_metabolism() 
 
 # DA Taxa
-DA_genera <- readRDS("./data/DA/DA_genus_processed.rds") %>%
+DA_genera <- readRDS("./data/DA_genus_processed_ags.rds") %>%
   pull(Genus) %>%
   unique()
 
@@ -180,7 +183,7 @@ pd = packLegend(heatmap_lgd, metab_lgd, direction = "horizontal",
                 max_width = unit(10, "cm"), row_gap = unit(5, "mm"))
 
 # Figure output location
-fname_rel <- "./figures/genus_level_rel_ab_bottom.png"
+fname_rel <- "./figures/genus_level_rel_ab_AGS.png"
 
 # Draw combined heatmap
 png(fname_rel,
