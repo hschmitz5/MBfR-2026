@@ -133,7 +133,7 @@ p <- ggplot(summary_long, aes(x = exp_group, y = avg, fill = assay)) +
   facetted_pos_scales(
     y = list(
       # TB
-      scale_y_continuous(limits = c(0, max_tb_conc)), # TB MBfR
+      scale_y_continuous(limits = c(0, 10.5)), # TB MBfR
       scale_y_continuous(limits = c(0, max_tb_conc)), # TB AGS
       scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 3, 6)),
       scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 3, 6)),
