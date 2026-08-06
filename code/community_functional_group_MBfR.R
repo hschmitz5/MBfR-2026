@@ -20,11 +20,6 @@ rel_ab_df <- sum_rel_ab_by_function_mbfr(ps) %>%
 
 p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
   geom_col(position = "dodge", width = 0.6, fill = "steelblue") +
-  geom_errorbar(
-    aes(ymin = mean_sum - sd_sum, ymax = mean_sum + sd_sum),
-    width = 0.2,
-    position = position_dodge(width = 0.6)
-  ) +
   facet_wrap(~metab, scales = "free_y", nrow = 1) +
   labs(
     y = "Relative\nAbundance (%)",
@@ -43,7 +38,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
   ) 
   
 # Save plot
-fname <- "./figures/functional_group_abundance.png"
+fname <- "./figures/functional_group_MBfR.png"
 ggsave(fname, plot = p, width = 6.5, height = 2, dpi = 300)
 
 
