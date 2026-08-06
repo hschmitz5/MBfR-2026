@@ -64,7 +64,7 @@ p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +  # fill = metab_va
   ) 
   
 # Save plot
-fname <- "./figures/functional_group_comparison.png"
+fname <- "./figures/functional_group_filamentous.png"
 ggsave(fname, plot = p, width = 6.5, height = 2.5, dpi = 300)
 
 
