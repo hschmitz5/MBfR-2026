@@ -29,7 +29,7 @@ sum_rel_ab_by_function_mbfr <- function(ps) {
         filter(Genus %in% taxa_list[[nm]]) %>%
         group_by(Sample) %>%
         summarize(
-          sum_abund = sum(Abundance, na.rm = TRUE),
+          sum_abund = sum(Abundance),
           .groups = "drop"
         ) %>%
         mutate(metab = nm)
@@ -44,9 +44,10 @@ sum_rel_ab_by_function_mbfr <- function(ps) {
   summarize_metab <- function(df, value_col) {
     df %>%
       group_by(metab, Sample) %>%
+      # summarize is only to bind rows with AGS (no replicates - no mean)
       summarize(
-        mean_sum = mean(sum_abund, na.rm = TRUE),
-        sd_sum = sd(sum_abund, na.rm = TRUE),
+        mean_sum = sum_abund,  
+        sd_sum = NA,  
         .groups = "drop"
       ) %>%
       mutate(metab_val = value_col)
