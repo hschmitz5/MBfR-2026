@@ -9,6 +9,8 @@ source("./code/02_sum_rel_ab_by_function_ags.R")
 
 write2excel <- 0
 
+metab_fname <- "./data/metabolism_midas_filamentous.xlsx"
+
 rel_ab_mbfr <- sum_rel_ab_by_function_mbfr(ps) %>%
   filter(metab == "Filamentous") %>%
   rename(exp_category = Sample) %>%
@@ -17,8 +19,7 @@ rel_ab_mbfr <- sum_rel_ab_by_function_mbfr(ps) %>%
 # load AGS data
 ps_ags <- readRDS("./data/phyloseq/ps_genus_full_AGS.rds")
 
-size <- data.frame(
-  ranges = levels(ps_ags@sam_data$size.mm),
+size_meta <- data.frame(
   name = levels(ps_ags@sam_data$size.name)
 )
 
@@ -36,25 +37,25 @@ rel_ab_df <- bind_rows(rel_ab_mbfr, rel_ab_ags) %>%
 
 # ------------ Plot ------------------
 
-p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) +  # fill = metab_val)) +
+p <- ggplot(rel_ab_df, aes(x = exp_category, y = mean_sum)) + #, fill = metab_val)) +
   geom_col(position = "dodge", width = 0.6, fill = "steelblue") +
   geom_errorbar(
     aes(ymin = mean_sum - sd_sum, ymax = mean_sum + sd_sum),
     width = 0.2,
     position = position_dodge(width = 0.6)
   ) +
-  facet_wrap(~biofilm, scales = "free") +
+  facet_wrap(~biofilm, scales = "free_x") +
   force_panelsizes(cols = c(0.4, 1)) +
   labs(
     title = "Filamentous",
     y = "Relative\nAbundance (%)",
     x = "Biofilm"
   ) +
-  # scale_fill_manual(
-  #   name = "Functional Group",
-  #   values = c("Positive" = "steelblue",
-  #              "Positive + Variable" = "lightgray")
-  # ) +
+  scale_fill_manual(
+    name = "Functional Group",
+    values = c("Positive" = "steelblue",
+               "Positive + Variable" = "lightgray")
+  ) +
   theme_classic(base_size = 12) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1), 
