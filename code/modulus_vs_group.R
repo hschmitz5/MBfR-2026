@@ -18,7 +18,14 @@ modulus <- raw_df %>%
   ) %>%
   filter(
     !is.na(G),
-    freq_rad < 110)
+    freq_rad < 110
+    ) %>%
+  # * indicates apparent groups (with voids)
+  mutate(
+    exp_group = factor(exp_group, levels = group_levels),
+    exp_group = recode(exp_group, 
+                       "S" = "S*", "M" = "M*", "L" = "L*", "XL" = "XL*", "XXL" = "XXL*")
+  )
 
 # modulus_subset <- modulus %>%
 #   filter(freq_rad == 0.1) %>%
@@ -47,7 +54,6 @@ mod_summary_long <- mod_summary_wide %>%
     avg = avg/1000, 
     sd = sd/1000,
     # change display names and order
-    exp_group = factor(exp_group, levels = group_levels),
     measure = factor(measure, levels = c("G", "G2")),
     measure = recode(measure,"G"="Storage Modulus (G')","G2"='Loss Modulus (G")')
   )
