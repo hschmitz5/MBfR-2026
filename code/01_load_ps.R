@@ -8,7 +8,7 @@ suppressPackageStartupMessages({
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE)
 
 # load phyloseq object (absolute counts)
-ps <- readRDS("./data/phyloseq/ps_genus.rds")
+ps <- readRDS("./data/phyloseq/ps_genus_MBfR.rds")
 
 sam_name <- c("Inner", "Outer")
 
@@ -17,7 +17,6 @@ metab_fname <- "./data/metabolism_midas_mbfr.xlsx"
 
 
 # Color Palettes (MetBrewer)
-size_pal <- "Greek"     # reds
 taxa_pal <- "Hiroshige" # orange, blue
 
 
