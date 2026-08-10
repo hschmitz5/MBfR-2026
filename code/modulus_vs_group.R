@@ -17,8 +17,8 @@ modulus <- raw_df %>%
     names_pattern = "(G2?)_(\\d)"
   ) %>%
   filter(
-    !is.na(G),
-    freq_rad < 110
+    freq_rad < 110,
+    !is.na(G)
     ) %>%
   # * indicates apparent groups (with voids)
   mutate(
@@ -128,6 +128,6 @@ p1 <- ggplot(mod_summary_long, aes(x = freq_rad, y = avg, color = exp_group)) +
 #   labels = "auto", ncol = 1, rel_widths = c(6.5, 5)
 # )
 
-fname_out <- "./figures/moduli.png"
+fname_out <- "./figures/Figure_1.tif"
 ggsave(fname_out, plot = p1, width = 6.5, height = 2.5, dpi = 300)
 # ggsave(fname_out, plot = p, width = 6.5, height = 5, dpi = 300)

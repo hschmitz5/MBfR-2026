@@ -38,7 +38,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
   ) 
   
 # Save plot
-fname <- "./figures/functional_group_MBfR.png"
+fname <- "./figures/functional_group_MBfR.tif"
 ggsave(fname, plot = p, width = 6.5, height = 2, dpi = 300)
 
 

@@ -167,5 +167,5 @@ p <- ggplot(summary_long, aes(x = exp_group, y = avg, fill = assay)) +
   )
 
 
-fname_out <- "./figures/EPS_comparison.png"
+fname_out <- "./figures/Figure_2.tif"
 ggsave(fname_out, plot = p, width = 6.5, height = 6, dpi = 300)
