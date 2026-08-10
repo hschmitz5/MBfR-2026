@@ -7,7 +7,7 @@ source("./code/01_load_ps.R")
 # define sample names
 group_levels <- c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL")
 
-raw_df <- read_excel("./data/RheometryApr142026.xlsx", sheet = "input", skip = 1)
+raw_df <- read_excel("./data/Rheometry_MBfR_AGS.xlsx", sheet = "input", skip = 1)
 
 modulus <- raw_df %>%
   select(-freq_hz) %>%
@@ -66,6 +66,13 @@ mod_summary_long <- mod_summary_wide %>%
 #   filter(freq_rad == 0.1) %>%
 #   select(-freq_rad) 
 
+# ------ Correlation? ------
+
+# dat <- modulus %>%
+#   filter(
+#     (biofilm == "MBfR" & exp_group == "Outer") |
+#       (biofilm == "AGS" & exp_group == "Floccular")
+#   ) 
 
 #### Plot
 
