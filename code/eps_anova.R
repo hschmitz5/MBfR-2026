@@ -9,15 +9,11 @@ import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
     select(extract, group_name, replicate, PS = C_TSS)
   
   df_joined <- left_join(PN, PS, by = c("extract", group_name, "replicate")) %>%
-    mutate(
-      total = PN + PS, 
-      ratio = PN/PS,
-      biofilm = biofilm_type
-    ) %>%
-    select(biofilm, extract, exp_group = group_name, replicate, PN, PS, total, ratio)
+    mutate(biofilm = biofilm_type) %>%
+    select(biofilm, extract, exp_group = group_name, replicate, PN, PS)
 }
 
-ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size")
+ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size") 
 
 mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "MBfR", "region") %>%
   mutate(replicate = as.character(replicate))
@@ -28,7 +24,7 @@ eps <- bind_rows(ags_data, mbfr_data)
 
 # ------ t test ------
 
-eps_var = c("PN", "PS", "total", "ratio")
+eps_var = c("PN", "PS") #, "total", "ratio")
 
 res_overall <- map_dfr(c("LB", "TB"), \(ext) {
   df <- filter(eps, extract == ext)
@@ -100,10 +96,6 @@ res_pairwise <- map(c("LB", "TB"), \(ext) {
 
 res_pairwise$LB$PN
 res_pairwise$LB$PS
-res_pairwise$LB$total
-res_pairwise$LB$ratio
 
 res_pairwise$TB$PN
 res_pairwise$TB$PS
-res_pairwise$TB$total
-res_pairwise$TB$ratio
