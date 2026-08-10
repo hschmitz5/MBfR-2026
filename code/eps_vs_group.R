@@ -46,7 +46,7 @@ summary_long <- summary_wide %>%
   pivot_longer(
     cols = c(PN_avg, PN_sd,
              PS_avg, PS_sd,
-             total_avg,
+             total_avg, 
              ratio_avg),
     names_to = c("assay", ".value"),
     names_sep = "_"
@@ -67,28 +67,28 @@ summary_long <- summary_wide %>%
 max_tb_conc <- subset(summary_long, 
                       y_label == "\u00b5g/mgTSS" & extract == "Tightly Bound") %>%
   summarize(
-    max_val = max(avg + sd)
+    max_val = max(avg + sd, na.rm = TRUE)
     ) %>%
   pull(max_val)
 
 max_lb_conc <- subset(summary_long, 
                       y_label == "\u00b5g/mgTSS" & extract == "Loosely Bound") %>%
   summarize(
-    max_val = max(avg + sd)
+    max_val = max(avg + sd, na.rm = TRUE)
   ) %>%
   pull(max_val)
 
 max_tb_pnps <- subset(summary_long, 
                       y_label == "PN/PS" & extract == "Tightly Bound") %>%
   summarize(
-    max_val = max(avg + sd)
+    max_val = max(avg)
   ) %>%
   pull(max_val)
 
 max_lb_pnps <- subset(summary_long, 
                       y_label == "PN/PS" & extract == "Loosely Bound") %>%
   summarize(
-    max_val = max(avg + sd)
+    max_val = max(avg)
   ) %>%
   pull(max_val)
 
@@ -131,17 +131,15 @@ p <- ggplot(summary_long, aes(x = exp_group, y = avg, fill = assay)) +
   facetted_pos_scales(
     y = list(
       # TB
-      scale_y_continuous(limits = c(0, 10.5)), # TB MBfR
-      scale_y_continuous(limits = c(0, max_tb_conc)), # TB AGS
-      scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 3, 6)),
-      scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 3, 6)),
-      # scale_y_continuous(breaks = c(0, 2.5, 5)),
-      # scale_y_continuous(limits = c(0, 5), breaks = c(0, 2.5, 5)),
+      scale_y_continuous(limits = c(0, 10)), # MBfR
+      scale_y_continuous(limits = c(0, max_tb_conc)), # AGS
+      scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 2, 4)),
+      scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 2, 4)),
       # LB
-      scale_y_continuous(limits = c(0, max_lb_conc)), # LB MBfR
-      scale_y_continuous(limits = c(0, max_lb_conc)), # LB AGS
-      scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 4, 8)),
-      scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 4, 8))
+      scale_y_continuous(limits = c(0, max_lb_conc), breaks = c(0, 3, 6, 9, 12)), # MBfR
+      scale_y_continuous(limits = c(0, max_lb_conc), breaks = c(0, 3, 6, 9, 12)), # AGS
+      scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 2, 4)),
+      scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 2, 4))
     )
   ) +
   force_panelsizes(cols = c(1/3, 1), rows = c(1, 0.4, 1, 0.4)) +
