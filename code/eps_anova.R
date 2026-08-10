@@ -24,7 +24,7 @@ eps <- bind_rows(ags_data, mbfr_data)
 
 # ------ t test ------
 
-eps_var = c("PN", "PS") #, "total", "ratio")
+eps_var = c("PN", "PS") 
 
 res_overall <- map_dfr(c("LB", "TB"), \(ext) {
   df <- filter(eps, extract == ext)
