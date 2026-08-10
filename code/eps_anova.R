@@ -1,5 +1,6 @@
 rm(list = ls())
 library(tidyverse)
+library(writexl)
 
 import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
   PN <- readRDS(PN_fname) %>%
@@ -94,8 +95,22 @@ res_pairwise <- map(c("LB", "TB"), \(ext) {
   }) %>%
   set_names(c("LB", "TB"))
 
+# ------ View results ------
+
 res_pairwise$LB$PN
 res_pairwise$LB$PS
 
 res_pairwise$TB$PN
 res_pairwise$TB$PS
+
+fname_out <- "./data/EPS_stats.xlsx"
+write_xlsx(
+  list(
+    overall = res_overall,
+    LB_PN = res_pairwise$LB$PN,
+    LB_PS = res_pairwise$LB$PS,
+    TB_PN = res_pairwise$TB$PN,
+    TB_PS = res_pairwise$TB$PS
+  ),
+  path = fname_out
+)
