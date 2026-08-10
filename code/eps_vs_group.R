@@ -11,14 +11,12 @@ import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
   
   df_joined <- left_join(PN, PS, by = c("extract", group_name, "replicate")) %>%
     mutate(
-      total = PN + PS, 
-      ratio = PN/PS,
       biofilm = biofilm_type
     ) %>%
-    select(biofilm, extract, exp_group = group_name, replicate, PN, PS, total, ratio)
+    select(biofilm, extract, exp_group = group_name, replicate, PN, PS)
 }
 
-ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size")
+ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size") 
 
 mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "MBfR", "region") %>%
   mutate(replicate = as.character(replicate))
@@ -34,9 +32,9 @@ summary_wide <- eps %>%
     # polysaccharide
     PS_avg = mean(PS, na.rm = TRUE), PS_sd = sd(PS, na.rm = TRUE),
     # total 
-    total_avg = mean(total, na.rm = TRUE), total_sd = sd(total, na.rm = TRUE),
+    total_avg = PN_avg + PS_avg, 
     # PN/PS
-    ratio_avg = mean(ratio, na.rm = TRUE), ratio_sd = sd(ratio, na.rm = TRUE),
+    ratio_avg = PN_avg/PS_avg, 
     .groups = "drop"
   ) %>%
   mutate(
@@ -48,8 +46,8 @@ summary_long <- summary_wide %>%
   pivot_longer(
     cols = c(PN_avg, PN_sd,
              PS_avg, PS_sd,
-             total_avg, total_sd,
-             ratio_avg, ratio_sd),
+             total_avg,
+             ratio_avg),
     names_to = c("assay", ".value"),
     names_sep = "_"
   ) %>%
