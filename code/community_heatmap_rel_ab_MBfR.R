@@ -157,5 +157,4 @@ draw(pd, x = unit(0.13, "npc"), y = unit(0.03, "npc"), just = c("left", "bottom"
 dev.off()
 
 ## Check what percent of relative abundance is included in plot
-message(paste("Heatmap Min:", round(min(rel_sum), 2), "%"))
-message(paste("Heatmap Max:", round(max(rel_sum), 2), "%"))
+print(rel_sum)
