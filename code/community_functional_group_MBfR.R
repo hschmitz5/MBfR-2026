@@ -5,7 +5,7 @@ rm(list = ls())
 source("./code/01_load_ps.R")
 source("./code/02_sum_rel_ab_by_function_mbfr.R")
 
-write2excel <- 0
+write2excel <- 1
 
 metab_order <- c("Methanogens", "Fermenters", "Filamentous")
 
@@ -49,6 +49,9 @@ if (write2excel == 1) {
   ### Do not exclude data
   # define relative abundance
   rel_wide <- get_rel_wide(ps) %>%
+    # Arrange taxa from largest to smallest abundance
+    mutate(row_sum = rowSums(.)) %>%
+    arrange(desc(row_sum)) %>%
     rownames_to_column(var = "Genus")
   
   new_m <- get_metabolism(rel_wide) %>%
@@ -59,8 +62,7 @@ if (write2excel == 1) {
   full_df <- left_join(rel_wide, new_m, by = "Genus") %>%
     filter(tf == 1) %>%
     dplyr::select(-tf) %>%
-    relocate(where(is.numeric), .after = where(is.character)) %>%
-    arrange(Genus)
+    relocate(where(is.numeric), .after = where(is.character)) 
   
   library(writexl)
   write_xlsx(full_df, path = "./data/functional_rel_ab.xlsx")
