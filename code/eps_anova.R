@@ -39,8 +39,8 @@ res_overall <- map_dfr(c("LB", "TB"), \(ext) {
     p.value = map_dbl(
       eps_var,
       \(var) t.test(df[[var]] ~ df$biofilm)$p.value
-    )
-  ) %>%
+      )
+    ) %>%
     mutate(p.adjusted = p.adjust(p.value, method = "BH"))
 })
 
