@@ -25,6 +25,9 @@ eps <- bind_rows(ags_data, mbfr_data)
 
 # ------ t test ------
 
+# df <- filter(eps, extract == "LB")
+# test <- t.test(df[["PN"]] ~ df$biofilm)
+
 eps_var = c("PN", "PS") 
 
 res_overall <- map_dfr(c("LB", "TB"), \(ext) {
