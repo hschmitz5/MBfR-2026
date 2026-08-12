@@ -16,7 +16,7 @@ import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
 
 ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size") 
 
-mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "MBfR", "region") %>%
+mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "Methanogenic", "region") %>%
   mutate(replicate = as.character(replicate))
 
 # Combine both data sets
