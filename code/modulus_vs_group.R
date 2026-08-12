@@ -1,7 +1,7 @@
 rm(list = ls())
 library(tidyverse)
 library(readxl)
-# library(cowplot)
+library(writexl)
 source("./code/01_load_ps.R")
 
 # define sample names
@@ -17,7 +17,7 @@ modulus <- raw_df %>%
     names_pattern = "(G2?)_(\\d)"
   ) %>%
   filter(
-    freq_rad < 110,
+    freq_rad < 40,
     !is.na(G)
     ) %>%
   # * indicates apparent groups (with voids)
@@ -27,9 +27,31 @@ modulus <- raw_df %>%
                        "S" = "S*", "M" = "M*", "L" = "L*", "XL" = "XL*", "XXL" = "XXL*")
   )
 
-# modulus_subset <- modulus %>%
-#   filter(freq_rad == 0.1) %>%
-#   select(-freq_rad) 
+# ------ ANOVA ------
+
+modulus_sub <- modulus %>%
+  filter(exp_group %in% c("Inner", "Outer", "Floccular")) 
+
+# storage modulus
+G_res <- aov(modulus_sub$G ~ modulus_sub$exp_group)
+
+G_res_pairwise <- TukeyHSD(G_res)$`modulus_sub$exp_group` %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Comparison") %>%
+  mutate(mod_type = "G", .before = 1)
+
+# loss modulus
+G2_res <- aov(modulus_sub$G2 ~ modulus_sub$exp_group)
+
+G2_res_pairwise <- TukeyHSD(G2_res)$`modulus_sub$exp_group` %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "Comparison") %>%
+  mutate(mod_type = "G2", .before = 1)
+
+res_pair <- bind_rows(G_res_pairwise, G2_res_pairwise)
+
+fname_out <- "./data/G_stats.xlsx"
+write_xlsx(res_pair, path = fname_out)
 
 # ------ Summarize mean across replicates for plotting ------
 
@@ -58,21 +80,6 @@ mod_summary_long <- mod_summary_wide %>%
     measure = recode(measure,"G"="Storage Modulus (G')","G2"='Loss Modulus (G")')
   )
 
-# mod_subset_sum_w <- mod_summary_wide %>%
-#   filter(freq_rad == 0.1) %>%
-#   select(-freq_rad) 
-# 
-# mod_subset_sum_l <- mod_summary_long %>%
-#   filter(freq_rad == 0.1) %>%
-#   select(-freq_rad) 
-
-# ------ Correlation? ------
-
-# dat <- modulus %>%
-#   filter(
-#     (biofilm == "MBfR" & exp_group == "Outer") |
-#       (biofilm == "AGS" & exp_group == "Floccular")
-#   ) 
 
 #### Plot
 
@@ -101,33 +108,5 @@ p1 <- ggplot(mod_summary_long, aes(x = freq_rad, y = avg, color = exp_group)) +
       )
     )
 
-# p2 <- ggplot(mod_subset_sum_l %>% filter(exp_group != "Inner"), 
-#              aes(x = exp_group, y = avg, fill = measure)) +
-#   geom_col(position = "dodge", width = 0.6) +
-#   geom_errorbar(
-#     aes(ymin = avg - sd, ymax = avg + sd),
-#     width = 0.2,
-#     position = position_dodge(width = 0.6)
-#   ) +
-#   labs(
-#     title = "Frequency = 0.1 rad/s",
-#     x = "Group",
-#     y = "Modulus (kPa)"
-#   ) +
-#   scale_fill_manual(
-#     values = c("plum4", "lightgray")
-#   ) +
-#   theme_classic(base_size = 12) +
-#   theme(
-#     legend.title = element_blank()
-#   )
-# 
-# # arrange two plots into one column
-# p <- plot_grid(
-#   p1, p2,
-#   labels = "auto", ncol = 1, rel_widths = c(6.5, 5)
-# )
-
 fname_out <- "./figures/Figure_1.tif"
 ggsave(fname_out, plot = p1, width = 6.5, height = 2.5, dpi = 300)
-# ggsave(fname_out, plot = p, width = 6.5, height = 5, dpi = 300)
