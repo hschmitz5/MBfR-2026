@@ -18,7 +18,7 @@ import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
 
 ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size") 
 
-mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "MBfR", "region") %>%
+mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "Methanogenic", "region") %>%
   mutate(replicate = as.character(replicate))
 
 # Combine both data sets
@@ -38,7 +38,7 @@ summary_wide <- eps %>%
     .groups = "drop"
   ) %>%
   mutate(
-    biofilm = factor(biofilm, levels = c("MBfR", "AGS")),
+    biofilm = factor(biofilm, levels = c("Methanogenic", "AGS")),
     exp_group = factor(exp_group, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL"))
   )
 
@@ -131,18 +131,18 @@ p <- ggplot(summary_long, aes(x = exp_group, y = avg, fill = assay)) +
   facetted_pos_scales(
     y = list(
       # TB
-      scale_y_continuous(limits = c(0, 10)), # MBfR
+      scale_y_continuous(limits = c(0, 10)), # Methanogenic
       scale_y_continuous(limits = c(0, max_tb_conc)), # AGS
       scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 2, 4)),
       scale_y_continuous(limits = c(0, max_tb_pnps), breaks = c(0, 2, 4)),
       # LB
-      scale_y_continuous(limits = c(0, max_lb_conc), breaks = c(0, 3, 6, 9, 12)), # MBfR
+      scale_y_continuous(limits = c(0, max_lb_conc), breaks = c(0, 3, 6, 9, 12)), # Methanogenic
       scale_y_continuous(limits = c(0, max_lb_conc), breaks = c(0, 3, 6, 9, 12)), # AGS
       scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 2, 4)),
       scale_y_continuous(limits = c(0, max_lb_pnps), breaks = c(0, 2, 4))
     )
   ) +
-  force_panelsizes(cols = c(1/3, 1), rows = c(1, 0.4, 1, 0.4)) +
+  force_panelsizes(cols = c(0.35, 1), rows = c(1, 0.4, 1, 0.4)) +
   
   scale_fill_manual(
     values = c(
