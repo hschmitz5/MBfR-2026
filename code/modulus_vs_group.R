@@ -93,7 +93,7 @@ p1 <- ggplot(mod_summary_long, aes(x = freq_rad, y = avg, color = exp_group)) +
   facet_wrap(~measure, scales = "free_y", nrow = 1) +
   scale_y_log10() +  # changes scale distribution, not values
   scale_color_manual(
-    name = "Group",
+    name = "Fraction",
     values = c("darkseagreen3", "steelblue", "gray", met.brewer("Greek", 5))
   ) +
   labs(
