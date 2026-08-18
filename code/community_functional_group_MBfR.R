@@ -23,7 +23,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
   facet_wrap(~metab, scales = "free_y", nrow = 1) +
   labs(
     y = "Relative\nAbundance (%)",
-    x = "Region"
+    x = "Fraction"
   ) +
   # scale_fill_manual(
   #   name = "Functional Group",
