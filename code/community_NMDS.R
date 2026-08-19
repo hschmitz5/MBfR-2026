@@ -60,7 +60,7 @@ p <- ggplot(nmds_df, aes(NMDS1, NMDS2, color = biofilm)) +
     y = "Axis 2",
     color = "Biofilm") + 
     # fill = "Biofilm") +
-  theme_classic(base_size = 12) 
+  theme_classic(base_size = text_size) 
 
 fname <- "./figures/Figure_3.tif"
 ggsave(fname, plot = p, width = 6.5, height = 3, dpi = 300)

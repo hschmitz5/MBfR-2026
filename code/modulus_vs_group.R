@@ -100,7 +100,7 @@ p1 <- ggplot(mod_summary_long, aes(x = freq_rad, y = avg, color = exp_group)) +
     x = "Frequency (rad/s)",
     y = "Modulus (kPa)",
   ) +
-  theme_classic(base_size = 12) +
+  theme_classic(base_size = text_size) +
   theme(
     legend.position = "right",
     strip.background = element_rect(

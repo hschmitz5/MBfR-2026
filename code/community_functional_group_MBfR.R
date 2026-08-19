@@ -30,7 +30,7 @@ p <- ggplot(rel_ab_df, aes(x = Sample, y = mean_sum)) + #, fill = metab_val)) +
   #   values = c("Positive" = "steelblue",
   #              "Positive + Variable" = "lightgray")
   # ) +
-  theme_classic(base_size = 12) +
+  theme_classic(base_size = text_size) +
   theme(
     strip.background = element_rect(
       colour = NA # facet label outline
