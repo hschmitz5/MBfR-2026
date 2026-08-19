@@ -53,6 +53,7 @@ summary_long <- summary_wide %>%
   ) %>%
   mutate(
     y_label = if_else(assay == "ratio", "PN/PS", "\u00b5g/mgTSS"),
+    y_label = factor(y_label, levels = c("\u00b5g/mgTSS", "PN/PS")),
     # Write out LB and TB
     extract = factor(extract, levels = c("TB", "LB")),
     extract = recode(extract, "LB" = "Loosely Bound", "TB" = "Tightly Bound"),
