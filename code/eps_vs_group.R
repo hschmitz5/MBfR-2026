@@ -18,7 +18,7 @@ import_data <- function(PN_fname, PS_fname, biofilm_type, group_name) {
 
 ags_data <- import_data("./data/EPS/PN_conc_ags.rds", "./data/EPS/PS_conc_ags.rds", "AGS", "size") 
 
-mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "Methanogenic", "region") %>%
+mbfr_data <- import_data("./data/EPS/PN_conc_mbfr.rds", "./data/EPS/PS_conc_mbfr.rds", "Biomethanation", "region") %>%
   mutate(replicate = as.character(replicate))
 
 # Combine both data sets
@@ -38,7 +38,7 @@ summary_wide <- eps %>%
     .groups = "drop"
   ) %>%
   mutate(
-    biofilm = factor(biofilm, levels = c("Methanogenic", "AGS")),
+    biofilm = factor(biofilm, levels = c("Biomethanation", "AGS")),
     exp_group = factor(exp_group, levels = c("Inner", "Outer", "Floccular", "S", "M", "L", "XL", "XXL"))
   )
 
