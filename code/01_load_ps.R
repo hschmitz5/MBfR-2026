@@ -19,7 +19,7 @@ metab_fname <- "./data/metabolism_midas_mbfr.xlsx"
 # Color Palettes (MetBrewer)
 taxa_pal <- "Hiroshige" # orange, blue
 
-text_size <- 16 # 12
+text_size <- 12
 
 # ------ Functions for processing phyloseq object ----
 
