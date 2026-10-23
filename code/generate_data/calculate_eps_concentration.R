@@ -24,7 +24,7 @@ extract_volume = 10 # mL
 # Read in absorbance data
 df <- read_excel(fname_in, sheet = sheet_name, skip = 1) %>%
   mutate(
-    region = recode(region,"B" = "Inner","M" = "Outer")
+    region = recode(region,"B" = "Attached","M" = "Sloughed")
   ) 
 
 # define standards
