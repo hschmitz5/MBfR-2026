@@ -4,7 +4,7 @@ rm(list = ls())
 library(qiime2R)
 library(phyloseq)
 library(tidyverse)
-source("./code/generate_data/ps_agglom_function.R")
+source("./code/generate_data/rename_unclassified_seqs.R")
 
 # Import QIIME2 data as phyloseq object
 ps_full <- qiime2R::qza_to_phyloseq(
@@ -42,26 +42,21 @@ keep_taxa <- !(taxa_names(ps) %in% remove_names)
 
 ps_filt <- prune_taxa(keep_taxa, ps)
 
-# ------ Rarefy ------
-
-# define minimum depth to rarefy
-rarefy_level <- min(sample_sums(ps_filt))  # lowest number of ASVs per sample
-
-ps_rare <- rarefy_even_depth(
-  ps_filt, rarefy_level, rngseed = 1, replace = FALSE, trimOTUs = TRUE, verbose = TRUE
-)
-
 # ------ Save at ASV level ------
 
 saveRDS(ps_filt, file = "./data/phyloseq/ps_ASV.rds")
-saveRDS(ps_rare, file = "./data/phyloseq/ps_ASV_rarefied.rds")
 
-# ------ Agglomerate, keeping NA values  ------
+# ------ Rename Unclassified (NA) sequences and agglomerate ------
 
-ps_genus   <- agglom_genus(ps_filt)
-ps_species <- agglom_species(ps_filt)
+# replaces NA genus values with lowest classified taxon
+ps_filt2 <- rename_genus(ps_filt) 
+
+# combines taxa with the same genus
+ps_genus = tax_glom(ps_filt2, "Genus") 
+
+# relative abundance (%) per sample comprised of unclassified genera
+sample_sum <- check_unclassified_sum(ps_genus)
 
 # ------ Save ------
 
 saveRDS(ps_genus, file = "./data/phyloseq/ps_genus.rds")
-saveRDS(ps_species, file = "./data/phyloseq/ps_species.rds")
